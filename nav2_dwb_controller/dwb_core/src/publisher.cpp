@@ -105,7 +105,7 @@ DWBPublisher::on_configure()
   transformed_pub_ = node->create_publisher<nav_msgs::msg::Path>("transformed_global_plan", 1);
   local_pub_ = node->create_publisher<nav_msgs::msg::Path>("local_plan", 1);
   marker_pub_ = node->create_publisher<visualization_msgs::msg::MarkerArray>("marker", 1);
-  cost_grid_pc_pub_ = node->create_publisher<sensor_msgs::msg::PointCloud>("cost_cloud", 1);
+  cost_grid_pc_pub_ = node->create_publisher<sensor_msgs::msg::PointCloud2>("cost_cloud", 1);
 
   double marker_lifetime = 0.0;
   node->get_parameter(plugin_name_ + ".marker_lifetime", marker_lifetime);
@@ -256,7 +256,7 @@ DWBPublisher::publishCostGrid(
 
   if (!publish_cost_grid_pc_) {return;}
 
-  auto cost_grid_pc = std::make_unique<sensor_msgs::msg::PointCloud>();
+  auto cost_grid_pc = std::make_unique<sensor_msgs::msg::PointCloud2>();
   cost_grid_pc->header.frame_id = costmap_ros->getGlobalFrameID();
   cost_grid_pc->header.stamp = clock_->now();
 
@@ -292,10 +292,6 @@ DWBPublisher::publishCostGrid(
     }
   }
   cost_grid_pc->channels.push_back(totals);
-
-  // TODO(crdelsey): convert pc to pc2
-  // sensor_msgs::msg::PointCloud2 cost_grid_pc2;
-  // convertPointCloudToPointCloud2(cost_grid_pc, cost_grid_pc2);
   cost_grid_pc_pub_->publish(std::move(cost_grid_pc));
 }
 
